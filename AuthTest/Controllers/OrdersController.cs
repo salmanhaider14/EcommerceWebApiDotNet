@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AuthTest.Controllers
 {
-   
+    [Authorize]  
     [Route("api/[controller]")]
     [ApiController]
     public class OrdersController : ControllerBase
