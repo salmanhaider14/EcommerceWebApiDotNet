@@ -1,4 +1,4 @@
-﻿using AuthTest.Entitities;
+﻿using DotNetEcommerceAPI.Entitities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;

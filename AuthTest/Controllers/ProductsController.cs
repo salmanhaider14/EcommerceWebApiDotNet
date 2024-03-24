@@ -1,12 +1,12 @@
 ﻿
-using AuthTest.Entitities;
+using DotNetEcommerceAPI.Entitities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace AuthTest.Controllers
+namespace DotNetEcommerceAPI.Controllers
 {
     [Authorize]
     [Route("api/[controller]")]

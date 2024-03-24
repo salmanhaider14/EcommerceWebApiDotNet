@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-namespace AuthTest.Entitities
+namespace DotNetEcommerceAPI.Entitities
 {
     public class Category
     {
