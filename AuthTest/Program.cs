@@ -1,6 +1,7 @@
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,16 +21,52 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
+app.MapPost("/api/register", async (HttpContext context, UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager) =>
+{
+    var requestBody = await new StreamReader(context.Request.Body).ReadToEndAsync();
+    var userData = JsonSerializer.Deserialize<Dictionary<string, string>>(requestBody);
+
+    if (!userData.ContainsKey("email") || !userData.ContainsKey("password"))
+    {
+        context.Response.StatusCode = 400;
+        await context.Response.WriteAsync("Email and password are required.");
+        return;
+    }
+
+    var email = userData["email"];
+    var password = userData["password"];
+
+    var user = new IdentityUser { UserName = email, Email = email };
+
+    var result = await userManager.CreateAsync(user, password);
+
+    if (result.Succeeded)
+    {
+        // Assign default role to the user
+        await userManager.AddToRoleAsync(user, "Customer");
+
+        context.Response.StatusCode = 200;
+        await context.Response.WriteAsync("User registered successfully!");
+    }
+    else
+    {
+        context.Response.StatusCode = 400;
+        await context.Response.WriteAsync("Failed to register user. Please try again.");
+    }
+});
+
+
 using (var scope = app.Services.CreateScope())
 {
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-    if (!await roleManager.RoleExistsAsync(Roles.Admin))
+
+    string[] roles = { "Customer", "Admin" };
+    foreach(var role in roles)
     {
-        await roleManager.CreateAsync(new IdentityRole(Roles.Admin));
-    }
-    if (!await roleManager.RoleExistsAsync(Roles.User))
-    {
-        await roleManager.CreateAsync(new IdentityRole(Roles.User));
+        if (!await roleManager.RoleExistsAsync(role))
+        {
+            await roleManager.CreateAsync(new IdentityRole(role));
+        }
     }
 }
 using (var scope = app.Services.CreateScope())
@@ -43,7 +80,7 @@ using (var scope = app.Services.CreateScope())
     user.Email = email;
 
     await userManager.CreateAsync(user, pass);
-    await userManager.AddToRoleAsync(user, Roles.Admin);
+    await userManager.AddToRoleAsync(user, "Admin");
 }
 
 if (app.Environment.IsDevelopment())
@@ -60,9 +97,4 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
-
-public static class Roles
-{
-    public const string Admin = "Admin";
-    public const string User = "User";
-}
+public record RegistrationModel( string Email, string Password);
