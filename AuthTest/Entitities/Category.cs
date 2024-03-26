@@ -1,14 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
-namespace DotNetEcommerceAPI.Entitities
+namespace DotNetEcommerceAPI.Entitities;
+public class Category
 {
-    public class Category
-    {
-        [Key]
-        public int CategoryId { get; set; }
+    [Key]
+    public int CategoryId { get; set; }
 
-        [Required]
-        public string Name { get; set; }
+    [Required]
+    public string Name { get; set; }
 
-        public ICollection<Product>? Products { get; set; }
-    }
+    public ICollection<Product>? Products { get; set; }
 }

@@ -32,15 +32,12 @@ public class AppContext : IdentityDbContext<IdentityUser>
             .WithMany()
             .HasForeignKey(oi => oi.ProductId);
 
-        // Additional configuration for Category entity
         modelBuilder.Entity<Product>()
             .HasOne(p => p.Category)
             .WithMany(c => c.Products)
             .HasForeignKey(p => p.CategoryId);
         SeedData(modelBuilder);
 
-
-        // Optionally, you may want to seed initial data or add additional configurations here
     }
     private void SeedData(ModelBuilder modelBuilder)
     {
@@ -61,10 +58,6 @@ public class AppContext : IdentityDbContext<IdentityUser>
             new Product { ProductId = 4, Name = "Sofa", Description = "Comfortable sofa", Price = 499.99m, CategoryId = 4 },
             new Product { ProductId = 5, Name = "Basketball", Description = "Official size basketball", Price = 29.99m, CategoryId = 5 }
         );
-
-        
-
-        // Seed orders and order items if needed
     }
 
 }

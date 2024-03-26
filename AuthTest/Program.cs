@@ -19,10 +19,8 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 }); ;
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
-
-
 var app = builder.Build();
+
 using (var scope = app.Services.CreateScope())
 {
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
@@ -41,17 +39,13 @@ using (var scope = app.Services.CreateScope())
     var email = "ecomadmin@gmail.com";
     var pass = "Abc@12345";
 
-
     var user = new IdentityUser();
     user.UserName = email;
     user.Email = email;
 
     await userManager.CreateAsync(user, pass);
     await userManager.AddToRoleAsync(user, Roles.Admin);
-    
-
 }
-
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -68,7 +62,6 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
-
 
 // Define roles
 public static class Roles
