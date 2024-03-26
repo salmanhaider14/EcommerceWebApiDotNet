@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace DotNetEcommerceAPI.Controllers;
 
-[Authorize]
+[Authorize(Roles = "Admin")]
 [Route("api/[controller]")]
 [ApiController]
 public class CategoriesController : ControllerBase
@@ -17,13 +17,13 @@ public class CategoriesController : ControllerBase
     {
         _context = context;
     }
-
+    [AllowAnonymous]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Category>>> GetCategories()
     {
         return await _context.Categories.ToListAsync();
     }
-
+    [AllowAnonymous]
     [HttpGet("{id}")]
     public async Task<ActionResult<Category>> GetCategory(Guid id)
     {

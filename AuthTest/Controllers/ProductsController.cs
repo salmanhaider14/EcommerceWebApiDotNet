@@ -8,7 +8,7 @@ using System.Text.Json.Serialization;
 
 namespace DotNetEcommerceAPI.Controllers;
 
-[Authorize]
+[Authorize(Roles ="Admin")]
 [Route("api/[controller]")]
 [ApiController]
 public class ProductsController : ControllerBase

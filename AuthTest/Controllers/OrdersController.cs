@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DotNetEcommerceAPI.Controllers;
 
-[Authorize]
+[Authorize(Roles = "Customer,Admin")]
 [Route("api/[controller]")]
 [ApiController]
 public class OrdersController : ControllerBase
