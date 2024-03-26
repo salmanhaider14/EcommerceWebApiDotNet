@@ -19,7 +19,7 @@ public class OrdersController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Order>>> GetOrders(string userId = null,
+    public async Task<ActionResult<IEnumerable<Order>>> GetOrders(Guid? userId,
          OrderStatus? status = null,
 
         int? pageNumber = null,
@@ -30,9 +30,8 @@ public class OrdersController : ControllerBase
     {
         IQueryable<Order> query = _context.Orders.Include(o => o.User).Include(o => o.OrderItems);
 
-        if (!string.IsNullOrWhiteSpace(userId))
+        if (userId != null)
             query = query.Where(o => o.UserId == userId);
-
 
         if (status != null)
             query = query.Where(o => o.OrderStatus == status);
@@ -58,7 +57,7 @@ public class OrdersController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<Order>> GetOrder(int id)
+    public async Task<ActionResult<Order>> GetOrder(Guid id)
     {
         var order = await _context.Orders.FindAsync(id);
 
@@ -71,9 +70,9 @@ public class OrdersController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> PutOrder(int id, Order order)
+    public async Task<IActionResult> PutOrder(Guid id, Order order)
     {
-        if (id != order.OrderId)
+        if (id != order.Id)
         {
             return BadRequest();
         }
@@ -105,11 +104,11 @@ public class OrdersController : ControllerBase
         _context.Orders.Add(order);
         await _context.SaveChangesAsync();
 
-        return CreatedAtAction("GetOrder", new { id = order.OrderId }, order);
+        return CreatedAtAction("GetOrder", new { id = order.Id }, order);
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteOrder(int id)
+    public async Task<IActionResult> DeleteOrder(Guid id)
     {
         var order = await _context.Orders.FindAsync(id);
         if (order == null)
@@ -123,8 +122,8 @@ public class OrdersController : ControllerBase
         return NoContent();
     }
 
-    private bool OrderExists(int id)
+    private bool OrderExists(Guid id)
     {
-        return _context.Orders.Any(e => e.OrderId == id);
+        return _context.Orders.Any(e => e.Id == id);
     }
 }

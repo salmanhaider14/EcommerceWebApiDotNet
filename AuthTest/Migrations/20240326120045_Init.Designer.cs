@@ -8,11 +8,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace AuthTest.Migrations
+namespace DotNetEcommerceAPI.Migrations
 {
     [DbContext(typeof(AppContext))]
-    [Migration("20240323225219_OrderItemUpdated")]
-    partial class OrderItemUpdated
+    [Migration("20240326120045_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,57 +24,26 @@ namespace AuthTest.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("AuthTest.Entitities.Category", b =>
+            modelBuilder.Entity("DotNetEcommerceAPI.Entitities.Category", b =>
                 {
-                    b.Property<int>("CategoryId")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CategoryId"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("CategoryId");
+                    b.HasKey("Id");
 
                     b.ToTable("Categories");
-
-                    b.HasData(
-                        new
-                        {
-                            CategoryId = 1,
-                            Name = "Electronics"
-                        },
-                        new
-                        {
-                            CategoryId = 2,
-                            Name = "Clothing"
-                        },
-                        new
-                        {
-                            CategoryId = 3,
-                            Name = "Books"
-                        },
-                        new
-                        {
-                            CategoryId = 4,
-                            Name = "Furniture"
-                        },
-                        new
-                        {
-                            CategoryId = 5,
-                            Name = "Sports Equipment"
-                        });
                 });
 
-            modelBuilder.Entity("AuthTest.Entitities.Order", b =>
+            modelBuilder.Entity("DotNetEcommerceAPI.Entitities.Order", b =>
                 {
-                    b.Property<int>("OrderId")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderId"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime2");
@@ -82,30 +51,30 @@ namespace AuthTest.Migrations
                     b.Property<int>("OrderStatus")
                         .HasColumnType("int");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("UserId1")
                         .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("OrderId");
+                    b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId1");
 
                     b.ToTable("Orders");
                 });
 
-            modelBuilder.Entity("AuthTest.Entitities.OrderItem", b =>
+            modelBuilder.Entity("DotNetEcommerceAPI.Entitities.OrderItem", b =>
                 {
-                    b.Property<int>("OrderItemId")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("uniqueidentifier");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderItemId"));
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("OrderId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
@@ -113,7 +82,7 @@ namespace AuthTest.Migrations
                     b.Property<decimal>("UnitPrice")
                         .HasColumnType("decimal(18,2)");
 
-                    b.HasKey("OrderItemId");
+                    b.HasKey("Id");
 
                     b.HasIndex("OrderId");
 
@@ -122,16 +91,14 @@ namespace AuthTest.Migrations
                     b.ToTable("OrderItems");
                 });
 
-            modelBuilder.Entity("AuthTest.Entitities.Product", b =>
+            modelBuilder.Entity("DotNetEcommerceAPI.Entitities.Product", b =>
                 {
-                    b.Property<int>("ProductId")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("uniqueidentifier");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProductId"));
-
-                    b.Property<int?>("CategoryId")
-                        .HasColumnType("int");
+                    b.Property<Guid?>("CategoryId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -147,53 +114,11 @@ namespace AuthTest.Migrations
                     b.Property<string>("imageUrl")
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("ProductId");
+                    b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
 
                     b.ToTable("Products");
-
-                    b.HasData(
-                        new
-                        {
-                            ProductId = 1,
-                            CategoryId = 1,
-                            Description = "High-end smartphone",
-                            Name = "Smartphone",
-                            Price = 999.99m
-                        },
-                        new
-                        {
-                            ProductId = 2,
-                            CategoryId = 2,
-                            Description = "Casual t-shirt",
-                            Name = "T-shirt",
-                            Price = 19.99m
-                        },
-                        new
-                        {
-                            ProductId = 3,
-                            CategoryId = 3,
-                            Description = "Learn Java programming",
-                            Name = "Java Programming Book",
-                            Price = 29.99m
-                        },
-                        new
-                        {
-                            ProductId = 4,
-                            CategoryId = 4,
-                            Description = "Comfortable sofa",
-                            Name = "Sofa",
-                            Price = 499.99m
-                        },
-                        new
-                        {
-                            ProductId = 5,
-                            CategoryId = 5,
-                            Description = "Official size basketball",
-                            Name = "Basketball",
-                            Price = 29.99m
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -394,26 +319,24 @@ namespace AuthTest.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("AuthTest.Entitities.Order", b =>
+            modelBuilder.Entity("DotNetEcommerceAPI.Entitities.Order", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
                         .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UserId1");
 
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("AuthTest.Entitities.OrderItem", b =>
+            modelBuilder.Entity("DotNetEcommerceAPI.Entitities.OrderItem", b =>
                 {
-                    b.HasOne("AuthTest.Entitities.Order", "Order")
+                    b.HasOne("DotNetEcommerceAPI.Entitities.Order", "Order")
                         .WithMany("OrderItems")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("AuthTest.Entitities.Product", "Product")
+                    b.HasOne("DotNetEcommerceAPI.Entitities.Product", "Product")
                         .WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -424,9 +347,9 @@ namespace AuthTest.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("AuthTest.Entitities.Product", b =>
+            modelBuilder.Entity("DotNetEcommerceAPI.Entitities.Product", b =>
                 {
-                    b.HasOne("AuthTest.Entitities.Category", "Category")
+                    b.HasOne("DotNetEcommerceAPI.Entitities.Category", "Category")
                         .WithMany("Products")
                         .HasForeignKey("CategoryId");
 
@@ -484,12 +407,12 @@ namespace AuthTest.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("AuthTest.Entitities.Category", b =>
+            modelBuilder.Entity("DotNetEcommerceAPI.Entitities.Category", b =>
                 {
                     b.Navigation("Products");
                 });
 
-            modelBuilder.Entity("AuthTest.Entitities.Order", b =>
+            modelBuilder.Entity("DotNetEcommerceAPI.Entitities.Order", b =>
                 {
                     b.Navigation("OrderItems");
                 });

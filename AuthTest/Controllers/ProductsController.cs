@@ -40,7 +40,7 @@ public class ProductsController : ControllerBase
                 p.Description.ToLower().Contains(searchQuery.ToLower())
             );
         }
-        
+
         if (minPrice.HasValue)
             productsQuery = productsQuery.Where(p => p.Price >= minPrice);
 
@@ -78,9 +78,9 @@ public class ProductsController : ControllerBase
 
     [AllowAnonymous]
     [HttpGet("{id}")]
-    public async Task<ActionResult<Product>> GetProduct(int id)
+    public async Task<ActionResult<Product>> GetProduct(Guid id)
     {
-        var product = await _context.Products.Include(p => p.Category).FirstOrDefaultAsync(c => c.ProductId == id);
+        var product = await _context.Products.Include(p => p.Category).FirstOrDefaultAsync(c => c.Id == id);
 
         if (product == null)
         {
@@ -97,9 +97,9 @@ public class ProductsController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> PutProduct(int id, Product product)
+    public async Task<IActionResult> PutProduct(Guid id, Product product)
     {
-        if (id != product.ProductId)
+        if (id != product.Id)
         {
             return BadRequest();
         }
@@ -131,11 +131,11 @@ public class ProductsController : ControllerBase
         _context.Products.Add(product);
         await _context.SaveChangesAsync();
 
-        return CreatedAtAction("GetProduct", new { id = product.ProductId }, product);
+        return CreatedAtAction("GetProduct", new { id = product.Id }, product);
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteProduct(int id)
+    public async Task<IActionResult> DeleteProduct(Guid id)
     {
         var product = await _context.Products.FindAsync(id);
         if (product == null)
@@ -148,8 +148,8 @@ public class ProductsController : ControllerBase
 
         return NoContent();
     }
-    private bool ProductExists(int id)
+    private bool ProductExists(Guid id)
     {
-        return _context.Products.Any(e => e.ProductId == id);
+        return _context.Products.Any(e => e.Id == id);
     }
 }

@@ -1,12 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿
 namespace DotNetEcommerceAPI.Entitities;
 public class Category
 {
-    [Key]
-    public int CategoryId { get; set; }
-
-    [Required]
-    public string Name { get; set; }
-
-    public ICollection<Product>? Products { get; set; }
+    public Guid Id { get; set; }
+    public required string Name { get; set; }
+    public List<Product>? Products { get; set; }
 }

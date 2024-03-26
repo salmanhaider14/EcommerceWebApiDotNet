@@ -25,7 +25,7 @@ public class CategoriesController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<Category>> GetCategory(int id)
+    public async Task<ActionResult<Category>> GetCategory(Guid id)
     {
         var category = await _context.Categories.FindAsync(id);
 
@@ -38,9 +38,9 @@ public class CategoriesController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> PutCategory(int id, Category category)
+    public async Task<IActionResult> PutCategory(Guid id, Category category)
     {
-        if (id != category.CategoryId)
+        if (id != category.Id)
         {
             return BadRequest();
         }
@@ -72,11 +72,11 @@ public class CategoriesController : ControllerBase
         _context.Categories.Add(category);
         await _context.SaveChangesAsync();
 
-        return CreatedAtAction("GetCategory", new { id = category.CategoryId }, category);
+        return CreatedAtAction("GetCategory", new { id = category.Id }, category);
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteCategory(int id)
+    public async Task<IActionResult> DeleteCategory(Guid id)
     {
         var category = await _context.Categories.FindAsync(id);
         if (category == null)
@@ -90,8 +90,8 @@ public class CategoriesController : ControllerBase
         return NoContent();
     }
 
-    private bool CategoryExists(int id)
+    private bool CategoryExists(Guid id)
     {
-        return _context.Categories.Any(e => e.CategoryId == id);
+        return _context.Categories.Any(e => e.Id == id);
     }
 }
