@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DotNetEcommerceAPI.Entitities;
 public enum OrderStatus
-{
+{s
     Pending,
     Processing,
     Shipped,
@@ -23,9 +23,7 @@ public class Order
     public DateTime OrderDate { get; set; }
 
     [Required]
-
     public OrderStatus OrderStatus { get; set; }
-
     public IdentityUser? User { get; set; }
     public ICollection<OrderItem> OrderItems { get; set; }
 }

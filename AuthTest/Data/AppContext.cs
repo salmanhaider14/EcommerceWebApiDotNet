@@ -9,7 +9,6 @@ public class AppContext : IdentityDbContext<IdentityUser>
     {
 
     }
-
     public DbSet<Product> Products { get; set; }
     public DbSet<Order> Orders { get; set; }
     public DbSet<Category> Categories { get; set; }
@@ -20,7 +19,7 @@ public class AppContext : IdentityDbContext<IdentityUser>
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.Entity<OrderItem>()
-            .HasKey(oi => oi.OrderItemId); // OrderItemId is unique identifier for OrderItem
+            .HasKey(oi => oi.OrderItemId); 
 
         modelBuilder.Entity<OrderItem>()
             .HasOne(oi => oi.Order)
