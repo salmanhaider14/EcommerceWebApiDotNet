@@ -1,28 +1,22 @@
 ﻿
+using DotNetEcommerceAPI.Data;
 using DotNetEcommerceAPI.Entitities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace DotNetEcommerceAPI.Controllers;
 
 [Authorize(Roles ="Admin")]
 [Route("api/[controller]")]
 [ApiController]
-public class ProductsController : ControllerBase
+public class ProductsController(AppContext context) : ControllerBase
 {
-    private readonly AppContext _context;
-
-    public ProductsController(AppContext context)
-    {
-        _context = context;
-    }
+    private readonly AppContext _context = context;
 
     [AllowAnonymous]
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Product>>> GetProducts(string categoryName = null, string searchQuery = null, decimal? minPrice = null,
+    public async Task<ActionResult<IEnumerable<ProductDTO>>> GetProducts(string categoryName = null, string searchQuery = null, decimal? minPrice = null,
         decimal? maxPrice = null,
         string sortBy = null,
         int? pageNumber = null,
@@ -66,19 +60,15 @@ public class ProductsController : ControllerBase
             productsQuery = productsQuery.Skip((pageNumber.Value - 1) * pageSize.Value).Take(pageSize.Value);
 
         var products = await productsQuery.ToListAsync();
-        var jsonOptions = new JsonSerializerOptions
-        {
-            ReferenceHandler = ReferenceHandler.Preserve,
-        };
+        var productDTOs = products.Select(p => new ProductDTO(p.Id, p.Name, p.Description, p.Price, p.imageUrl, p.CategoryId)).ToList();
 
-        var jsonResult = JsonSerializer.Serialize(products, jsonOptions);
-        return Content(jsonResult, "application/json");
-
+        return productDTOs;
+        
     }
 
     [AllowAnonymous]
     [HttpGet("{id}")]
-    public async Task<ActionResult<Product>> GetProduct(Guid id)
+    public async Task<ActionResult<ProductDTO>> GetProduct(Guid id)
     {
         var product = await _context.Products.Include(p => p.Category).FirstOrDefaultAsync(c => c.Id == id);
 
@@ -86,25 +76,27 @@ public class ProductsController : ControllerBase
         {
             return NotFound();
         }
-        var jsonOptions = new JsonSerializerOptions
-        {
-            ReferenceHandler = ReferenceHandler.Preserve,
-        };
 
-        var jsonResult = JsonSerializer.Serialize(product, jsonOptions);
-        return Content(jsonResult, "application/json");
-
+        var productDTO = new ProductDTO(product.Id, product.Name, product.Description, product.Price, product.imageUrl, product.CategoryId);
+        return productDTO;
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> PutProduct(Guid id, Product product)
+    public async Task<IActionResult> PutProduct(Guid id, UpdateProductDTO productDTO)
     {
-        if (id != product.Id)
+        
+        var product = await _context.Products.FindAsync(id);
+        if (product == null)
         {
-            return BadRequest();
+            return NotFound();
         }
 
-        _context.Entry(product).State = EntityState.Modified;
+       
+        product.Name = productDTO.Name;
+        product.Description = productDTO.Description;
+        product.Price = productDTO.Price;
+        product.imageUrl = productDTO.ImageUrl;
+        product.CategoryId = productDTO.CategoryId;
 
         try
         {
@@ -126,12 +118,23 @@ public class ProductsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<Product>> PostProduct(Product product)
+    public async Task<ActionResult<ProductDTO>> PostProduct(CreateProductDTO productDTO)
     {
+        var product = new Product
+        {
+            Id = Guid.NewGuid(),
+            Name = productDTO.Name,
+            Description = productDTO.Description,
+            Price = productDTO.Price,
+            imageUrl = productDTO.ImageUrl,
+            CategoryId = productDTO.CategoryId
+        };
+
         _context.Products.Add(product);
         await _context.SaveChangesAsync();
 
-        return CreatedAtAction("GetProduct", new { id = product.Id }, product);
+        var createdProductDTO = new ProductDTO(product.Id, product.Name, product.Description, product.Price, product.imageUrl, product.CategoryId);
+        return CreatedAtAction("GetProduct", new { id = product.Id }, createdProductDTO);
     }
 
     [HttpDelete("{id}")]

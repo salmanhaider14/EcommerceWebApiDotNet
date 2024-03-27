@@ -1,24 +1,29 @@
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDbContext<AppContext>
-    (options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-builder.Services.AddAuthorization();
-builder.Services.AddIdentityApiEndpoints<IdentityUser>().AddRoles<IdentityRole>().AddEntityFrameworkStores<AppContext>();
-
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-}); ;
+});
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddDbContext<AppContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddAuthorization();
+
+builder.Services.AddIdentityApiEndpoints<IdentityUser>().AddRoles<IdentityRole>()
+    .AddEntityFrameworkStores<AppContext>();
+
 var app = builder.Build();
 
 app.MapPost("/api/register", async (HttpContext context, UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager) =>
@@ -42,7 +47,7 @@ app.MapPost("/api/register", async (HttpContext context, UserManager<IdentityUse
 
     if (result.Succeeded)
     {
-        // Assign default role to the user
+        
         await userManager.AddToRoleAsync(user, "Customer");
 
         context.Response.StatusCode = 200;
@@ -55,13 +60,23 @@ app.MapPost("/api/register", async (HttpContext context, UserManager<IdentityUse
     }
 });
 
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+app.MapIdentityApi<IdentityUser>();
+
+app.UseHttpsRedirection();
+app.UseAuthorization();
+app.MapControllers();
 
 using (var scope = app.Services.CreateScope())
 {
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
     string[] roles = { "Customer", "Admin" };
-    foreach(var role in roles)
+    foreach (var role in roles)
     {
         if (!await roleManager.RoleExistsAsync(role))
         {
@@ -83,18 +98,5 @@ using (var scope = app.Services.CreateScope())
     await userManager.AddToRoleAsync(user, "Admin");
 }
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-app.MapIdentityApi<IdentityUser>();
-
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
-app.MapControllers();
-
 app.Run();
-public record RegistrationModel( string Email, string Password);
+public record RegistrationModel(string Email, string Password);

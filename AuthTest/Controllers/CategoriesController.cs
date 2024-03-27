@@ -3,29 +3,27 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using DotNetEcommerceAPI.Entitities;
 using Microsoft.AspNetCore.Authorization;
+using DotNetEcommerceAPI.Data;
 
 namespace DotNetEcommerceAPI.Controllers;
 
 [Authorize(Roles = "Admin")]
 [Route("api/[controller]")]
 [ApiController]
-public class CategoriesController : ControllerBase
+public class CategoriesController(AppContext context) : ControllerBase
 {
-    private readonly AppContext _context;
+    private readonly AppContext _context = context;
 
-    public CategoriesController(AppContext context)
-    {
-        _context = context;
-    }
     [AllowAnonymous]
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Category>>> GetCategories()
+    public async Task<ActionResult<IEnumerable<CategoryDTO>>> GetCategories()
     {
-        return await _context.Categories.ToListAsync();
+        var categories = await _context.Categories.ToListAsync();
+        return categories.Select(c => new CategoryDTO(c.Id ,c.Name)).ToList();
     }
     [AllowAnonymous]
     [HttpGet("{id}")]
-    public async Task<ActionResult<Category>> GetCategory(Guid id)
+    public async Task<ActionResult<CategoryDTO>> GetCategory(Guid id)
     {
         var category = await _context.Categories.FindAsync(id);
 
@@ -34,18 +32,16 @@ public class CategoriesController : ControllerBase
             return NotFound();
         }
 
-        return category;
+        return new CategoryDTO(category.Id, category.Name);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> PutCategory(Guid id, Category category)
+    public async Task<IActionResult> PutCategory(Guid id, UpdateCategoryDTO categoryDTO)
     {
-        if (id != category.Id)
-        {
-            return BadRequest();
-        }
+        var category = await _context.Categories.FindAsync(id);
+        if (category == null) return NotFound();
 
-        _context.Entry(category).State = EntityState.Modified;
+        category.Name = categoryDTO.Name;
 
         try
         {
@@ -67,12 +63,17 @@ public class CategoriesController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<Category>> PostCategory(Category category)
+    public async Task<ActionResult<CategoryDTO>> PostCategory(CreateCategoryDTO categoryDTO)
     {
+        var category = new Category
+        {
+            Name = categoryDTO.Name,
+        };
         _context.Categories.Add(category);
         await _context.SaveChangesAsync();
 
-        return CreatedAtAction("GetCategory", new { id = category.Id }, category);
+        var createdCategoryDto = new CategoryDTO(category.Id, category.Name);
+        return CreatedAtAction("GetCategory", new { id = category.Id }, createdCategoryDto);
     }
 
     [HttpDelete("{id}")]
