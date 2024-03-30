@@ -32,7 +32,7 @@ To get started with the DotNet Ecommerce API, follow these steps:
 1.  Clone the Repository: Clone the repository to your local machine.
 2.  Configure the Database: Update the connection string in the `appsettings.json` file to point to your SQL Server instance.
 3.  Run Migrations: Execute Entity Framework Core migrations to create the database schema.
-4.  Start the API: Run the application and navigate to the Swagger UI to explore the available endpoints.
+4.  Start the API: Run the application and navigate to `/swagger` site to explore the available endpoints.
 
 API Endpoints
 -------------
